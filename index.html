@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Lighting Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #ffcc00;
+            --secondary-color: #333333;
+            --accent-color: #5555ff;
+            --dimmer-color: #f2f2f2;
+            --button-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --button-hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #222222;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Button styles */
+        button {
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            box-shadow: var(--button-shadow);
+            color: white;
+            padding: 1rem;
+            flex: 1;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--button-hover-shadow);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .role-button {
+            background: var(--primary-color);
+            color: black;
+            width: 100%;
+        }
+
+        .role-button:hover {
+            background: linear-gradient(135deg, #ffd700, #ffae00);
+        }
+
+        /* Color Buttons */
+        .color-buttons-container {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .color-button {
+            flex: 1;
+            height: 80px;
+            border-radius: 16px;
+        }
+
+        .color-button-red {
+            background: linear-gradient(135deg, #ff1a1a, #ff4d4d);
+        }
+
+        .color-button-red:hover {
+            background: linear-gradient(135deg, #ff3333, #ff6666);
+        }
+
+        .color-button-green {
+            background: linear-gradient(135deg, #1aff1a, #4dff4d);
+        }
+
+        .color-button-green:hover {
+            background: linear-gradient(135deg, #33ff33, #66ff66);
+        }
+
+        .color-button-blue {
+            background: linear-gradient(135deg, #1a1aff, #4d4dff);
+        }
+
+        .color-button-blue:hover {
+            background: linear-gradient(135deg, #3333ff, #6666ff);
+        }
+
+        .custom-color-button {
+            background: linear-gradient(135deg, #ff8800, #ffaa00);
+            width: 100%;
+        }
+
+        .custom-color-button:hover {
+            background: linear-gradient(135deg, #ff9900, #ffbb33);
+        }
+
+        /* Slider styles */
+        .slider-container {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .slider {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider label {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #444;
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: background var(--transition-speed);
+        }
+
+        .slider input[type="range"]::-webkit-slider-thumb:hover {
+            background: #ffd700;
+        }
+
+        .slider .value-display {
+            width: 50px;
+            text-align: center;
+        }
+
+        .go-back-button {
+            background: linear-gradient(135deg, #333333, #444444);
+            color: white;
+            width: 100%;
+        }
+
+        .go-back-button:hover {
+            background: linear-gradient(135deg, #444444, #555555);
+        }
+
+        /* Styles for the "Enviar" button */
+        .send-color-button {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+            width: 100%;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            box-shadow: var(--button-shadow);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .send-color-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--button-hover-shadow);
+        }
+
+        .send-color-button:active {
+            transform: translateY(2px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .slider label {
+                font-size: 0.9rem;
+            }
+
+            .slider .value-display {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Additional styles for PAR LED display and color preview */
+        #par-led-display {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        #color-preview {
+            width: 80px;
+            height: 80px;
+            background-color: #000;
+            border-radius: var(--border-radius);
+            border: 2px solid #555;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive Lighting Control</h1>
+        <!-- Display Assigned PAR LED ID -->
+        <p>Your PAR LED: <span id="par-led-display">Not assigned</span></p>
+        <!-- Color Preview Square -->
+        <div id="color-preview"></div>
+        <!-- Get Assigned Role Button -->
+        <button class="role-button" id="getRoleButton">Get Assigned Role</button>
+        <!-- Color Buttons -->
+        <div class="color-buttons-container" id="colorButtonsContainer">
+            <button class="color-button color-button-red" id="redButton">Red</button>
+            <button class="color-button color-button-green" id="greenButton">Green</button>
+            <button class="color-button color-button-blue" id="blueButton">Blue</button>
+        </div>
+        <!-- Custom Color Button -->
+        <button class="custom-color-button" id="customColorButton">Cor Customizada</button>
+        <!-- Sliders Section -->
+        <div class="slider-container" id="sliderContainer">
+            <div class="slider">
+                <label for="dimmerSlider">Dimmer</label>
+                <input type="range" id="dimmerSlider" min="0" max="255" value="0">
+                <span class="value-display" id="dimmerValue">0</span>
+            </div>
+            <div class="slider">
+                <label for="redSlider">Red</label>
+                <input type="range" id="redSlider" min="0" max="255" value="0">
+                <span class="value-display" id="redValue">0</span>
+            </div>
+            <div class="slider">
+                <label for="greenSlider">Green</label>
+                <input type="range" id="greenSlider" min="0" max="255" value="0">
+                <span class="value-display" id="greenValue">0</span>
+            </div>
+            <div class="slider">
+                <label for="blueSlider">Blue</label>
+                <input type="range" id="blueSlider" min="0" max="255" value="0">
+                <span class="value-display" id="blueValue">0</span>
+            </div>
+            <div class="slider">
+                <label for="whiteSlider">White</label>
+                <input type="range" id="whiteSlider" min="0" max="255" value="0">
+                <span class="value-display" id="whiteValue">0</span>
+            </div>
+            <!-- Enviar Button -->
+            <button class="send-color-button" id="sendColorButton">Enviar</button>
+            <!-- Go Back Button -->
+            <button class="go-back-button" id="goBackButton">Go Back</button>
+        </div>
+    </div>
+
+    <script>
+        // Generate or retrieve UUID
+        let uuid = localStorage.getItem('uuid');
+        if (!uuid) {
+            uuid = self.crypto.randomUUID();
+            localStorage.setItem('uuid', uuid);
+        }
+
+        const backendUrl = 'https://759c-2804-868-d050-5d1c-947c-d24-fc3d-161e.ngrok-free.app'; // Replace with your backend URL
+
+        let parLedId = null;
+
+        // Function to register user and get assigned PAR LED
+        async function registerUser() {
+            console.log(`Attempting to register with UUID: ${uuid}`);
+            try {
+                const response = await fetch(`${backendUrl}/register`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ uuid: uuid })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    parLedId = data.par_led;
+                    updateParLedDisplay();
+                    console.log(`Assigned PAR LED: ${parLedId}`);
+                    // Hide the "Get Assigned Role" button
+                    document.getElementById('getRoleButton').style.display = 'none';
+                } else {
+                    const errorText = await response.text();
+                    console.error('Registration failed:', errorText);
+                    alert('Registration failed: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Function to update PAR LED display
+        function updateParLedDisplay() {
+            const parLedDisplay = document.getElementById('par-led-display');
+            if (parLedId) {
+                parLedDisplay.textContent = parLedId;
+            } else {
+                parLedDisplay.textContent = 'Not assigned';
+            }
+        }
+
+        // Function to update color preview square
+        function updateColorPreview(colorArray) {
+            const [Dimmer, Red, Green, Blue, White, Strobe] = colorArray;
+            const colorPreview = document.getElementById('color-preview');
+            // Calculate displayed color based on RGB and Dimmer values
+            const r = Math.min(255, ((Red + White) * Dimmer) / 255);
+            const g = Math.min(255, ((Green + White) * Dimmer) / 255);
+            const b = Math.min(255, ((Blue + White) * Dimmer) / 255);
+            colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Function to send color update to backend
+        async function sendColorUpdate(colorArray) {
+            if (!parLedId) {
+                alert('You have not been assigned a PAR LED.');
+                return;
+            }
+            try {
+                const response = await fetch(`${backendUrl}/update-color`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ uuid: uuid, color: colorArray })
+                });
+                if (response.ok) {
+                    console.log(`Color updated for PAR LED ${parLedId}`);
+                    // Update the color preview square
+                    updateColorPreview(colorArray);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Color update failed:', errorText);
+                    alert('Color update failed: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Event listeners for the buttons
+        document.getElementById('getRoleButton').addEventListener('click', registerUser);
+
+        document.getElementById('redButton').addEventListener('click', () => {
+            const colorArray = [255, 255, 0, 0, 0, 0]; // Dimmer, Red, Green, Blue, White, Strobe
+            sendColorUpdate(colorArray);
+        });
+
+        document.getElementById('greenButton').addEventListener('click', () => {
+            const colorArray = [255, 0, 255, 0, 0, 0];
+            sendColorUpdate(colorArray);
+        });
+
+        document.getElementById('blueButton').addEventListener('click', () => {
+            const colorArray = [255, 0, 0, 255, 0, 0];
+            sendColorUpdate(colorArray);
+        });
+
+        // Custom Color Button event listener
+        document.getElementById('customColorButton').addEventListener('click', () => {
+            document.getElementById('sliderContainer').style.display = 'flex';
+            document.getElementById('colorButtonsContainer').style.display = 'none';
+            document.getElementById('customColorButton').style.display = 'none';
+        });
+
+        // Go Back Button event listener
+        document.getElementById('goBackButton').addEventListener('click', () => {
+            document.getElementById('sliderContainer').style.display = 'none';
+            document.getElementById('colorButtonsContainer').style.display = 'flex';
+            document.getElementById('customColorButton').style.display = 'block';
+        });
+
+        // Sliders
+        const sliders = document.querySelectorAll('.slider input[type="range"]');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', () => {
+                const valueDisplay = slider.parentElement.querySelector('.value-display');
+                valueDisplay.textContent = slider.value;
+                // Update the color preview as sliders change
+                const colorArray = getSliderValues();
+                updateColorPreview(colorArray);
+            });
+        });
+
+        // Function to get values from sliders
+        function getSliderValues() {
+            const dimmer = parseInt(document.getElementById('dimmerSlider').value);
+            const red = parseInt(document.getElementById('redSlider').value);
+            const green = parseInt(document.getElementById('greenSlider').value);
+            const blue = parseInt(document.getElementById('blueSlider').value);
+            const white = parseInt(document.getElementById('whiteSlider').value);
+            const strobe = 0; // If you have a strobe slider, get its value here
+            return [dimmer, red, green, blue, white, strobe];
+        }
+
+        // Added event listener for the "Enviar" button
+        document.getElementById('sendColorButton').addEventListener('click', () => {
+            const colorArray = getSliderValues();
+            sendColorUpdate(colorArray);
+        });
+
+        // Heartbeat function
+        function startHeartbeat() {
+            setInterval(async () => {
+                try {
+                    await fetch(`${backendUrl}/heartbeat`, {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ uuid: uuid })
+                    });
+                } catch (error) {
+                    console.error('Heartbeat error:', error);
+                }
+            }, 10000); // Every 10 seconds
+        }
+
+        // Start heartbeat on page load
+        window.onload = function() {
+            startHeartbeat();
+        };
+    </script>
+</body>
+</html>
